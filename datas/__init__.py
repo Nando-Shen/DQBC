@@ -10,5 +10,5 @@ def make_dataloader(cfg):
         raise NotImplementedError
     
     # sampler = DistributedSampler(train_dataset)
-    train_loader = data.DataLoader(train_dataset, batch_size=cfg.batch_size, num_workers=8, pin_memory=True, drop_last=True, sampler=sampler)
+    train_loader = data.DataLoader(train_dataset, batch_size=cfg.batch_size, num_workers=8, pin_memory=True, drop_last=True)
     return train_loader
