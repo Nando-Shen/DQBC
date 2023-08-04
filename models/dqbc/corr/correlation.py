@@ -17,7 +17,7 @@ def make_grids(H,W,dev):
     '''
     dx = torch.linspace(0.5,W-0.5,W,device=dev)
     dy = torch.linspace(0.5,H-0.5,H,device=dev)
-    return torch.stack(torch.meshgrid(dy,dx,indexing='ij')[::-1],dim=-1)
+    return torch.stack(torch.meshgrid(dy,dx)[::-1],dim=-1)
 
 def to_relative(grids,H,W):
     '''
