@@ -48,7 +48,7 @@ model:
 train:
   data:
     name: Vimeo90K
-    dataset_root: datasets/vimeo_triplet
+    dataset_root: /home/curry/jshe2377/atd12k_points
     crop_size: [256,256]
     rgb_order: rgb
     aug_script: rife
@@ -78,7 +78,7 @@ val:
   val-10:
     data:
       name: Vimeo90K
-      dataset_root: datasets/vimeo_triplet
+      dataset_root: /home/curry/jshe2377/atd12k_points
       rgb_order: rgb
     
     num_val: 10
