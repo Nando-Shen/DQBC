@@ -118,8 +118,8 @@ if __name__=='__main__':
     profile = model_profile(cfg.model)
 
     logger.print(profile+'\n')
-    if hasattr(model.module,'info'):
-        logger.print(model.module.info())
+    # if hasattr(model.module,'info'):
+    #     logger.print(model.module.info())
     
     
 
