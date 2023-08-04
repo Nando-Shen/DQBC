@@ -143,7 +143,8 @@ if __name__=='__main__':
     while should_keep_training:
         # sampler.set_epoch(epoch)
         epoch += 1
-        print("epoch: {}".format(epoch))
+        if epoch % 5000 == 0:
+            print("epoch: {}".format(epoch))
         for i_batch, data_blob in enumerate(train_loader):
             
             for param_group in optimizer.param_groups:
