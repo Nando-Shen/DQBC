@@ -95,7 +95,7 @@ if __name__=='__main__':
     model.train()
     # model = DDP(model)
     
-    sampler, train_loader = make_dataloader(cfg.train)
+    train_loader = make_dataloader(cfg.train)
 
     iters_per_epoch = len(train_loader)
 
@@ -145,7 +145,7 @@ if __name__=='__main__':
 
     epoch = 0
     while should_keep_training:
-        sampler.set_epoch(epoch)
+        # sampler.set_epoch(epoch)
         epoch += 1
         for i_batch, data_blob in enumerate(train_loader):
             
