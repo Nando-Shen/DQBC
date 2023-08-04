@@ -10,8 +10,8 @@ import torch.optim as optim
 from utils.logger import Logger
 import os.path as osp
 from functools import partial
-import torch.distributed as dist
-from torch.nn.parallel import DistributedDataParallel as DDP
+# import torch.distributed as dist
+# from torch.nn.parallel import DistributedDataParallel as DDP
 import argparse
 import time
 import numpy as np
@@ -63,20 +63,20 @@ if __name__=='__main__':
     args = parser.parse_args()
     
 
-    dist.init_process_group(backend='nccl')
+    # dist.init_process_group(backend='nccl')
     
-    local_rank = dist.get_rank()
+    # local_rank = dist.get_rank()
 
-    torch.cuda.set_device(local_rank)
+    torch.set_device("cuda")
     
-    if local_rank==0:
-        cfg = make_config(cfg_file=args.config)
-    dist.barrier()
+    # if local_rank==0:
+    cfg = make_config(cfg_file=args.config)
+    # dist.barrier()
 
-    if local_rank>0:
-        cfg_file = args.config
-        cfg_file = osp.join(osp.dirname(cfg_file),osp.basename(cfg_file)+'.full')
-        cfg = make_config(cfg_file=cfg_file,launch_experiment=False)
+    # if local_rank>0:
+    #     cfg_file = args.config
+    #     cfg_file = osp.join(osp.dirname(cfg_file),osp.basename(cfg_file)+'.full')
+    #     cfg = make_config(cfg_file=cfg_file,launch_experiment=False)
 
     if hasattr(cfg.train, 'manual_seed'):
         seed = cfg.train.manual_seed
@@ -93,7 +93,7 @@ if __name__=='__main__':
 
     model = make_model(cfg.model)
     model.train()
-    model = DDP(model)
+    # model = DDP(model)
     
     sampler, train_loader = make_dataloader(cfg.train)
 
@@ -110,16 +110,16 @@ if __name__=='__main__':
 
     total_steps = cfg.init_step
     
-    if local_rank==0:
-        logger = Logger(cfg.log, model, scheduler, init_step = total_steps)
-        
-        validator = Validator(cfg.val, model, iters_per_epoch)
+    # if local_rank==0:
+    logger = Logger(cfg.log, model, scheduler, init_step = total_steps)
 
-        profile = model_profile(cfg.model)
-        
-        logger.print(profile+'\n')
-        if hasattr(model.module,'info'):
-            logger.print(model.module.info())
+    validator = Validator(cfg.val, model, iters_per_epoch)
+
+    profile = model_profile(cfg.model)
+
+    logger.print(profile+'\n')
+    if hasattr(model.module,'info'):
+        logger.print(model.module.info())
         
     
             
@@ -177,31 +177,30 @@ if __name__=='__main__':
             gpu_time += time.time() - t0
 
             # print(f'{local_rank}: ?')
-            if local_rank==0:
 
-                if logger.step(metrics,'gpu_t %.1fs, cpu_t %.1fs'%(gpu_time,cpu_time)):
-                    cpu_time = 0
-                    gpu_time = 0
-                
-                val_results = validator.val(total_steps)
-                
-                for res in val_results:
-                    logger.write_dict(res)
-                    logger.print('validate: '+repr(res))
+            if logger.step(metrics,'gpu_t %.1fs, cpu_t %.1fs'%(gpu_time,cpu_time)):
+                cpu_time = 0
+                gpu_time = 0
 
-                if hasattr(cfg.train, 'save_after_epoch'):
-                    after_epoch = cfg.train.save_after_epoch
-                else:
-                    after_epoch = False
+            val_results = validator.val(total_steps)
 
-                if check_step(total_steps, cfg.train.save_freq, iters_per_epoch, after_epoch):
-                    save_path = osp.join(cfg.ckp_root ,'%d_%s.pth' % (total_steps+1, cfg.exp_name))
-                    torch.save(model.state_dict(), save_path)
-                    logger.print('save model %s'%save_path)
-                    
-                    opt_path = osp.join(cfg.ckp_root, '%d_%s.opt.pth' % (total_steps+1, cfg.exp_name))
-                    torch.save(optimizer.state_dict(), opt_path)
-                    logger.print('save optimizer %s'%opt_path)
+            for res in val_results:
+                logger.write_dict(res)
+                logger.print('validate: '+repr(res))
+
+            if hasattr(cfg.train, 'save_after_epoch'):
+                after_epoch = cfg.train.save_after_epoch
+            else:
+                after_epoch = False
+
+            if check_step(total_steps, cfg.train.save_freq, iters_per_epoch, after_epoch):
+                save_path = osp.join(cfg.ckp_root ,'%d_%s.pth' % (total_steps+1, cfg.exp_name))
+                torch.save(model.state_dict(), save_path)
+                logger.print('save model %s'%save_path)
+
+                opt_path = osp.join(cfg.ckp_root, '%d_%s.opt.pth' % (total_steps+1, cfg.exp_name))
+                torch.save(optimizer.state_dict(), opt_path)
+                logger.print('save optimizer %s'%opt_path)
             
 
             t0 = time.time()
@@ -211,11 +210,11 @@ if __name__=='__main__':
             if total_steps > cfg.train.num_steps:
                 should_keep_training = False
                 break
-        dist.barrier()
+        # dist.barrier()
 
-    if local_rank==0:
-        logger.close()
-        save_path = osp.join(cfg.ckp_root ,'%d_%s.pth' % (total_steps+1, cfg.name))
-        torch.save(model.state_dict(), save_path)
-        logger.print('save model %s'%save_path) 
+    # if local_rank==0:
+    logger.close()
+    save_path = osp.join(cfg.ckp_root ,'%d_%s.pth' % (total_steps+1, cfg.name))
+    torch.save(model.state_dict(), save_path)
+    logger.print('save model %s'%save_path)
 
