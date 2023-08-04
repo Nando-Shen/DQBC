@@ -67,7 +67,7 @@ if __name__=='__main__':
     
     # local_rank = dist.get_rank()
 
-    torch.set_device("cuda")
+    # torch.set_device("cuda")
     
     # if local_rank==0:
     cfg = make_config(cfg_file=args.config)
