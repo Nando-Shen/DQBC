@@ -120,10 +120,6 @@ if __name__=='__main__':
     logger.print(profile+'\n')
     if hasattr(model.module,'info'):
         logger.print(model.module.info())
-        
-    
-            
-    
     
     
 
