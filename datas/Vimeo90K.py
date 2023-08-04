@@ -12,9 +12,15 @@ class Vimeo_train(data.Dataset):
     def __init__(self, args):
         self.crop_size = args.crop_size
         self.sequence_list = []
-        with open('%s/tri_trainlist.txt' % args.dataset_root, 'r') as txt:
-            for line in txt:
-                self.sequence_list.append('%s/sequences/%s' % (args.dataset_root, line.strip()))
+        self.data_root = args.dataset_root
+        self.image_root = self.data_root
+        # with open('%s/tri_trainlist.txt' % args.dataset_root, 'r') as txt:
+        #     for line in txt:
+        #         self.sequence_list.append('%s/sequences/%s' % (args.dataset_root, line.strip()))
+
+        self.meta_data = os.listdir(os.path.join(self.data_root, 'train_10k'))
+        self.image_root = os.path.join(self.image_root, 'train_10k')
+
         self.rgb_order = args.rgb_order
         if hasattr(args, 'aug_script'):
             self.aug_script = args.aug_script
@@ -113,14 +119,16 @@ class Vimeo_train(data.Dataset):
         return map(TF.to_tensor, (frame1.copy(), frame2.copy(), frame3.copy()))
 
     def __getitem__(self, index):
+        imgpath = os.path.join(self.image_root, self.meta_data[index])
+        imgpaths = [imgpath + '/frame1.jpg', imgpath + '/frame2.jpg', imgpath + '/frame3.jpg']
 
-        First_fn  = os.path.join(self.sequence_list[index], 'im1.png')
-        Second_fn = os.path.join(self.sequence_list[index], 'im2.png')
-        Third_fn  = os.path.join(self.sequence_list[index], 'im3.png')
+        # First_fn  = os.path.join(self.sequence_list[index], 'im1.png')
+        # Second_fn = os.path.join(self.sequence_list[index], 'im2.png')
+        # Third_fn  = os.path.join(self.sequence_list[index], 'im3.png')
 
-        frame1 = imread(First_fn, self.rgb_order)
-        frame2 = imread(Second_fn, self.rgb_order)
-        frame3 = imread(Third_fn, self.rgb_order)
+        frame1 = imread(imgpaths[0], self.rgb_order)
+        frame2 = imread(imgpaths[1], self.rgb_order)
+        frame3 = imread(imgpaths[2], self.rgb_order)
 
         frame1, frame2, frame3 = self.transform(frame1, frame2, frame3)
 
@@ -134,15 +142,17 @@ class Vimeo_train(data.Dataset):
 class Vimeo_validation(data.Dataset):
     def __init__(self, args):
         self.sequence_list = []
-        tri_list = 'tri_testlist.txt'
-        if hasattr(args,'tri_list'):
-            tri_list = args.tri_list
-        with open('%s/%s'%(args.dataset_root,tri_list),'r') as txt:
-            for line in txt:
-                line = line.strip()
-                if line=='':
-                    continue
-                self.sequence_list.append('%s/sequences/%s'%(args.dataset_root, line))
+        # tri_list = 'tri_testlist.txt'
+        # if hasattr(args,'tri_list'):
+        #     tri_list = args.tri_list
+        # with open('%s/%s'%(args.dataset_root,tri_list),'r') as txt:
+        #     for line in txt:
+        #         line = line.strip()
+        #         if line=='':
+        #             continue
+        #         self.sequence_list.append('%s/sequences/%s'%(args.dataset_root, line))
+        self.data_root = args.dataset_root
+        self.image_root = self.data_root
         if hasattr(args,'rgb_order'):
             self.rgb_order = args.rgb_order
         else:
@@ -153,13 +163,16 @@ class Vimeo_validation(data.Dataset):
         return map(TF.to_tensor, (frame1, frame3))
 
     def __getitem__(self, index):
-        first_fn = os.path.join(self.sequence_list[index],'im1.png')
-        second_fn = os.path.join(self.sequence_list[index],'im2.png')
-        third_fn = os.path.join(self.sequence_list[index],'im3.png')
+        imgpath = os.path.join(self.image_root, self.meta_data[index])
+        imgpaths = [imgpath + '/frame1.jpg', imgpath + '/frame2.jpg', imgpath + '/frame3.jpg']
 
-        frame1 = imread(first_fn, self.rgb_order)
-        frame2 = imread(second_fn, self.rgb_order)
-        frame3 = imread(third_fn, self.rgb_order)
+        # First_fn  = os.path.join(self.sequence_list[index], 'im1.png')
+        # Second_fn = os.path.join(self.sequence_list[index], 'im2.png')
+        # Third_fn  = os.path.join(self.sequence_list[index], 'im3.png')
+
+        frame1 = imread(imgpaths[0], self.rgb_order)
+        frame2 = imread(imgpaths[1], self.rgb_order)
+        frame3 = imread(imgpaths[2], self.rgb_order)
 
         frame1, frame3 = self.transform(frame1, frame3)
 
