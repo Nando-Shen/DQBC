@@ -3,16 +3,13 @@ import torch.nn.functional as F
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.optim import AdamW
 from models.loss import *
-
-from config import *
-
     
 class Model:
     def __init__(self, local_rank):
-        backbonetype, multiscaletype = MODEL_CONFIG['MODEL_TYPE']
-        backbonecfg, multiscalecfg = MODEL_CONFIG['MODEL_ARCH']
-        self.net = multiscaletype(backbonetype(**backbonecfg), **multiscalecfg)
-        self.name = MODEL_CONFIG['LOGNAME']
+        # backbonetype, multiscaletype = MODEL_CONFIG['MODEL_TYPE']
+        # backbonecfg, multiscalecfg = MODEL_CONFIG['MODEL_ARCH']
+        # self.net = multiscaletype(backbonetype(**backbonecfg), **multiscalecfg)
+        # self.name = MODEL_CONFIG['LOGNAME']
         self.device()
 
         # train
