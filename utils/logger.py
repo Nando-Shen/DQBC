@@ -12,6 +12,7 @@ class Logger:
         self.writer = None
         self.sum_freq = cfg.sum_freq
         self.log_file = osp.join(cfg.exp_root,cfg.exp_name+'.log')
+        print(self.log_file)
         if hasattr(cfg,'tb_log_dir'):
             self.log_dir = cfg.tb_log_dir
         else:
