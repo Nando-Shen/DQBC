@@ -51,7 +51,7 @@ def train(model, local_rank, batch_size, data_path):
             imgs = imgs.to(device, non_blocking=True) / 255.
             imgs, gt = imgs[:, 0:6], imgs[:, 6:]
             learning_rate = get_learning_rate(step)
-            _, loss = model.update(imgs, gt, learning_rate, training=True)
+            _, loss = model(imgs[:, 0:3], imgs[:, 3:6])
             train_time_interval = time.time() - time_stamp
             time_stamp = time.time()
             if step % 200 == 1 and local_rank == 0:
