@@ -8,12 +8,16 @@ import numpy as np
 import random
 import argparse
 
+from utils.config import make_config
+
 from Trainer import Model
 from dataset import VimeoDataset
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data.distributed import DistributedSampler
 from config import *
+from models import make_model, model_profile
+
 
 device = torch.device("cuda")
 exp = os.path.abspath('.').split('/')[-1]
@@ -88,7 +92,16 @@ if __name__ == "__main__":
     parser.add_argument('--world_size', default=4, type=int, help='world size')
     parser.add_argument('--batch_size', default=8, type=int, help='batch size')
     parser.add_argument('--data_path', type=str, help='data path of vimeo90k')
+    # args = parser.parse_args()
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--config')
+
     args = parser.parse_args()
+
+    cfg = make_config(cfg_file=args.config)
+    model = make_model(cfg.model)
+
     torch.distributed.init_process_group(backend="nccl", world_size=args.world_size)
     torch.cuda.set_device(args.local_rank)
     if args.local_rank == 0 and not os.path.exists('log'):
@@ -99,6 +112,6 @@ if __name__ == "__main__":
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.benchmark = True
-    model = Model(args.local_rank)
+    # model = Model(args.local_rank)
     train(model, args.local_rank, args.batch_size, args.data_path)
         
