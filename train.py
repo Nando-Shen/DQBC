@@ -14,7 +14,7 @@ from dataset import VimeoDataset
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data.distributed import DistributedSampler
-from config import *
+# from config import *
 from models import make_model, model_profile
 
 
