@@ -7,6 +7,7 @@ import torch.distributed as dist
 import numpy as np
 import random
 import argparse
+from losses import make_loss
 
 from utils.config import make_config
 
@@ -29,7 +30,7 @@ def get_learning_rate(step):
         mul = np.cos((step - 2000) / (300 * args.step_per_epoch - 2000) * math.pi) * 0.5 + 0.5
         return (2e-4 - 2e-5) * mul + 2e-5
 
-def train(model, local_rank, batch_size, data_path):
+def train(model, local_rank, batch_size, data_path, cfg):
     if local_rank == 0:
         writer = SummaryWriter('log/train_EMAVFI')
     step = 0
@@ -43,6 +44,7 @@ def train(model, local_rank, batch_size, data_path):
     val_data = DataLoader(dataset_val, batch_size=batch_size, pin_memory=True, num_workers=8)
     print('training...')
     time_stamp = time.time()
+    loss_fn = make_loss(cfg)
     for epoch in range(300):
         sampler.set_epoch(epoch)
         for i, imgs in enumerate(train_data):
@@ -51,7 +53,8 @@ def train(model, local_rank, batch_size, data_path):
             imgs = imgs.to(device, non_blocking=True) / 255.
             imgs, gt = imgs[:, 0:6], imgs[:, 6:]
             learning_rate = get_learning_rate(step)
-            _, loss = model(imgs[:, 0:3], imgs[:, 3:6])
+            pred = model(imgs[:, 0:3], imgs[:, 3:6])
+            loss, metrics = loss_fn(pred, gt)
             train_time_interval = time.time() - time_stamp
             time_stamp = time.time()
             if step % 200 == 1 and local_rank == 0:
@@ -109,5 +112,5 @@ if __name__ == "__main__":
     torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.benchmark = True
     # model = Model(args.local_rank)
-    train(model, args.local_rank, args.batch_size, args.data_path)
+    train(model, args.local_rank, args.batch_size, args.data_path, cfg)
         
