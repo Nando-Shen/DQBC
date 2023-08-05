@@ -92,9 +92,8 @@ if __name__ == "__main__":
     parser.add_argument('--batch_size', default=8, type=int, help='batch size')
     parser.add_argument('--data_path', type=str, help='data path of vimeo90k')
     # args = parser.parse_args()
-
-    parser = argparse.ArgumentParser()
     parser.add_argument('--config')
+    parser = argparse.ArgumentParser()
 
     args = parser.parse_args()
 
