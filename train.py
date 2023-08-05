@@ -76,7 +76,7 @@ def evaluate(model, val_data, nr_eval, local_rank):
         imgs = imgs.to(device, non_blocking=True) / 255.
         imgs, gt = imgs[:, 0:6], imgs[:, 6:]
         with torch.no_grad():
-            pred, _ = model.update(imgs, gt, training=False)
+            pred, _ = model(imgs[:, 0:3], imgs[:, 3:6])
         for j in range(gt.shape[0]):
             psnr.append(-10 * math.log10(((gt[j] - pred[j]) * (gt[j] - pred[j])).mean().cpu().item()))
    
