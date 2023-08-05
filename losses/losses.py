@@ -16,8 +16,8 @@ def _make_loss(losses):
 def make_vfi2_loss(cfg):
     loss_fn = {
         'l1': lambda pred, gt, opt : F.l1_loss(pred['final'],gt),
-        'l1_tea': lambda pred,gt, opt: F.l1_loss(pred['merged_tea'],gt),
-        'distill': lambda pred, gt, opt : pred['loss_distill'],
+        # 'l1_tea': lambda pred,gt, opt: F.l1_loss(pred['merged_tea'],gt),
+        # 'distill': lambda pred, gt, opt : pred['loss_distill'],
         }
     losses = []
     for tag, opt in children(cfg):
