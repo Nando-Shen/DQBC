@@ -2,8 +2,7 @@ import torch
 import torch.nn.functional as F
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.optim import AdamW
-from model.loss import *
-from model.warplayer import warp
+from models.loss import *
 
 from config import *
 
