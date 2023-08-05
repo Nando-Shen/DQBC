@@ -56,10 +56,10 @@ train:
   loss:
     l1:
       w: 1
-    l1_tea:
-      w: 1
-    distill:
-      w: 0.01
+#    l1_tea:
+#      w: 1
+#    distill:
+#      w: 0.01
   lr:
     type: warm_cosine
     peak: 0.0002
