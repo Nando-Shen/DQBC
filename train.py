@@ -8,6 +8,7 @@ import numpy as np
 import random
 import argparse
 from losses import make_loss
+import os.path as osp
 
 from utils.config import make_config
 
@@ -15,12 +16,23 @@ from dataset import VimeoDataset
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data.distributed import DistributedSampler
+import torch.optim as optim
+
 # from config import *
 from models import make_model, model_profile
 
 
 device = torch.device("cuda")
 exp = os.path.abspath('.').split('/')[-1]
+
+
+def make_optimizer(cfg, model):
+    """ Create the optimizer and learning rate scheduler """
+
+    optimizer = optim.AdamW(model.parameters(), lr=1e-6, weight_decay=cfg.wdecay)
+
+    return optimizer
+
 
 def get_learning_rate(step):
     if step < 2000:
@@ -33,6 +45,9 @@ def get_learning_rate(step):
 def train(model, local_rank, batch_size, data_path, cfg):
     if local_rank == 0:
         writer = SummaryWriter('log/train_EMAVFI')
+    optimizer = make_optimizer(cfg.train, model)
+    save_path = osp.join(cfg.ckp_root, '%s.pth' % (cfg.exp_name))
+
     step = 0
     nr_eval = 0
     best = 0
@@ -55,6 +70,8 @@ def train(model, local_rank, batch_size, data_path, cfg):
             learning_rate = get_learning_rate(step)
             pred = model(imgs[:, 0:3], imgs[:, 3:6])
             loss, metrics = loss_fn(pred, gt)
+            loss.backward()
+            optimizer.step()
             train_time_interval = time.time() - time_stamp
             time_stamp = time.time()
             if step % 200 == 1 and local_rank == 0:
@@ -66,8 +83,8 @@ def train(model, local_rank, batch_size, data_path, cfg):
         nr_eval += 1
         if nr_eval % 3 == 0:
             evaluate(model, val_data, nr_eval, local_rank)
-        model.save_model(local_rank)    
-            
+
+        torch.save(model.state_dict(), save_path)
         dist.barrier()
 
 def evaluate(model, val_data, nr_eval, local_rank):
