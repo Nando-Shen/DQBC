@@ -12,7 +12,6 @@ class Logger:
         self.writer = None
         self.sum_freq = cfg.sum_freq
         self.log_file = osp.join(cfg.exp_root,cfg.exp_name+'.log')
-        print(self.log_file)
         if hasattr(cfg,'tb_log_dir'):
             self.log_dir = cfg.tb_log_dir
         else:
@@ -20,6 +19,8 @@ class Logger:
 
         if self.total_steps!=0:
             self.print('RESUME from step %d'%self.total_steps)
+        print(self.log_file)
+
 
     def _print_training_status(self):
         

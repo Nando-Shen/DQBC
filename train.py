@@ -186,10 +186,11 @@ if __name__=='__main__':
                 logger.write_dict(res)
                 logger.print('validate: '+repr(res))
 
-            if hasattr(cfg.train, 'save_after_epoch'):
-                after_epoch = cfg.train.save_after_epoch
-            else:
-                after_epoch = False
+            # if hasattr(cfg.train, 'save_after_epoch'):
+            #     after_epoch = cfg.train.save_after_epoch
+            # else:
+            #     after_epoch = False
+            after_epoch = True
 
             if check_step(total_steps, cfg.train.save_freq, iters_per_epoch, after_epoch):
                 save_path = osp.join(cfg.ckp_root ,'%d_%s.pth' % (total_steps+1, cfg.exp_name))
