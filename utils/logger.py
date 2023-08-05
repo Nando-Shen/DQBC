@@ -62,6 +62,7 @@ class Logger:
     def get_writer(self):
         if self.writer is None:
             self.writer = SummaryWriter(log_dir=self.log_dir)
+        print("writing into {}".format(self.log_dir))
         return self.writer
 
     def write_dict(self, results):
