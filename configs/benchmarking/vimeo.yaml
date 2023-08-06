@@ -53,7 +53,7 @@ val:
   vimeo:
     data:
       name: Vimeo90K
-      dataset_root: datasets/vimeo_triplet
+      dataset_root: /home/curry/jshe2377/atd12k_points
       rgb_order: rgb
 
     viz: false
@@ -61,4 +61,4 @@ val:
 exp_name: benchmark_dqbc_vimeo
 reset: true
 
-# python val.py --config configs/benchmarking/vimeo.yaml --gpu_id 1
+# python val.py --config configs/benchmarking/vimeo.yaml --gpu_id 0
