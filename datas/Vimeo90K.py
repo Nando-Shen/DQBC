@@ -154,6 +154,7 @@ class Vimeo_validation(data.Dataset):
         self.data_root = args.dataset_root
         self.image_root = self.data_root
         self.meta_data = os.listdir(os.path.join(self.data_root, 'test_2k_540p'))
+        self.sequence_list = self.meta_data
         self.image_root = os.path.join(self.image_root, 'test_2k_540p')
         if hasattr(args,'rgb_order'):
             self.rgb_order = args.rgb_order
