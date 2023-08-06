@@ -189,7 +189,7 @@ def validate(cfg, model, log_file_path=None, val_tag=''):
     psnr = np.mean(psnr_list)
     ssim = np.mean(ssim_list)
     ie = np.mean(ie_list)
-    report = f'{val_tag} average validation psnr: {psnr} ssim={ssim} ie={ie}\taverage inference time: {time_infer/len(ind)} s/image'
+    report = f'{val_tag} average validation psnr: {psnr} ssim={ssim} ie={ie}\taverage inference time: {time_infer} s/image'
     print(report)
     if log_file_path is not None:
         with open(log_file_path,'a') as f:
