@@ -82,7 +82,7 @@ def train(model, local_rank, batch_size, data_path, cfg):
                 print('epoch:{} {}/{} time:{:.2f}+{:.2f} loss:{:.4e}'.format(epoch, i, args.step_per_epoch, data_time_interval, train_time_interval, loss))
             step += 1
         nr_eval += 1
-        if nr_eval % 3 == 0:
+        if nr_eval % 1 == 0:
             evaluate(model, val_data, nr_eval, local_rank)
 
         torch.save(model.state_dict(), save_path)
@@ -109,7 +109,7 @@ def evaluate(model, val_data, nr_eval, local_rank):
         I0 = (torch.tensor(I0.transpose(2, 0, 1)).cuda() / 255.).unsqueeze(0)
         I2 = (torch.tensor(I2.transpose(2, 0, 1)).cuda() / 255.).unsqueeze(0)
         with torch.no_grad():
-            mid = model(I0, I2)['final']
+            mid = model(I0, I2)['final'][0]
         ssim = ssim_matlab(torch.tensor(I1.transpose(2, 0, 1)).cuda().unsqueeze(0) / 255.,
                            mid.unsqueeze(0)).detach().cpu().numpy()
         mid = mid.detach().cpu().numpy().transpose(1, 2, 0)
