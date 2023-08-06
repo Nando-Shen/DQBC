@@ -82,8 +82,9 @@ def train(model, local_rank, batch_size, data_path, cfg):
                 print('epoch:{} {}/{} time:{:.2f}+{:.2f} loss:{:.4e}'.format(epoch, i, args.step_per_epoch, data_time_interval, train_time_interval, loss))
             step += 1
         nr_eval += 1
-        if nr_eval % 1 == 0:
+        if nr_eval % 3 == 0:
             evaluate(model, val_data, nr_eval, local_rank)
+            exit()
 
         torch.save(model.state_dict(), save_path)
         dist.barrier()
@@ -115,7 +116,7 @@ def evaluate(model, val_data, nr_eval, local_rank):
         mid = mid.detach().cpu().numpy().transpose(1, 2, 0)
         I1 = I1 / 255.
         psnr = -10 * math.log10(((I1 - mid) * (I1 - mid)).mean())
-        os.makedirs('/home/curry/jshe2377/dqtest/' + name)
+        # os.makedirs('/home/curry/jshe2377/dqtest/' + name)
         mid = mid * 255.
         cv2.imwrite(r"/home/curry/jshe2377/dqtest/" + name + "/emavfi.jpg", mid)
         psnr_list.append(psnr)
