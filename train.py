@@ -11,6 +11,7 @@ from losses import make_loss
 import os.path as osp
 
 from utils.config import make_config
+from benchmark.utils.pytorch_msssim import ssim_matlab
 
 from dataset import VimeoDataset
 from torch.utils.data import DataLoader
@@ -90,20 +91,52 @@ def train(model, local_rank, batch_size, data_path, cfg):
 def evaluate(model, val_data, nr_eval, local_rank):
     if local_rank == 0:
         writer_val = SummaryWriter('log/validate_EMAVFI')
+    path = '/home/curry/jshe2377/atd12k_points'
+    f = os.listdir(os.path.join(path, 'test_2k_540p'))
+    psnr_list, ssim_list = [], []
 
-    psnr = []
-    for _, imgs in enumerate(val_data):
-        imgs = imgs.to(device, non_blocking=True) / 255.
-        imgs, gt = imgs[:, 0:6], imgs[:, 6:]
+    for i in f:
+        name = str(i).strip()
+        size = (384, 192)
+        if (len(name) <= 1):
+            continue
+        I0 = cv2.imread(path + '/test_2k_540p/' + name + '/frame1.jpg')
+        I1 = cv2.imread(path + '/test_2k_540p/' + name + '/frame2.jpg')
+        I2 = cv2.imread(path + '/test_2k_540p/' + name + '/frame3.jpg')  # BGR -> RBG
+        I0 = cv2.resize(I0, size)
+        I1 = cv2.resize(I1, size)
+        I2 = cv2.resize(I2, size)
+        I0 = (torch.tensor(I0.transpose(2, 0, 1)).cuda() / 255.).unsqueeze(0)
+        I2 = (torch.tensor(I2.transpose(2, 0, 1)).cuda() / 255.).unsqueeze(0)
         with torch.no_grad():
-            pred = model(imgs[:, 0:3], imgs[:, 3:6])['final']
-        for j in range(gt.shape[0]):
-            psnr.append(-10 * math.log10(((gt[j] - pred[j]) * (gt[j] - pred[j])).mean().cpu().item()))
-   
-    psnr = np.array(psnr).mean()
-    if local_rank == 0:
-        print(str(nr_eval), psnr)
-        writer_val.add_scalar('psnr', psnr, nr_eval)
+            mid = model(I0, I2)['final']
+        ssim = ssim_matlab(torch.tensor(I1.transpose(2, 0, 1)).cuda().unsqueeze(0) / 255.,
+                           mid.unsqueeze(0)).detach().cpu().numpy()
+        mid = mid.detach().cpu().numpy().transpose(1, 2, 0)
+        I1 = I1 / 255.
+        psnr = -10 * math.log10(((I1 - mid) * (I1 - mid)).mean())
+        os.makedirs('/home/curry/jshe2377/dqtest/' + name)
+        mid = mid * 255.
+        cv2.imwrite(r"/home/curry/jshe2377/dqtest/" + name + "/emavfi.jpg", mid)
+        psnr_list.append(psnr)
+        ssim_list.append(ssim)
+
+        print("Avg PSNR: {} SSIM: {}".format(np.mean(psnr_list), np.mean(ssim_list)))
+
+    #
+    # psnr = []
+    # for _, imgs in enumerate(val_data):
+    #     imgs = imgs.to(device, non_blocking=True) / 255.
+    #     imgs, gt = imgs[:, 0:6], imgs[:, 6:]
+    #     with torch.no_grad():
+    #         pred = model(imgs[:, 0:3], imgs[:, 3:6])['final']
+    #     for j in range(gt.shape[0]):
+    #         psnr.append(-10 * math.log10(((gt[j] - pred[j]) * (gt[j] - pred[j])).mean().cpu().item()))
+    #
+    # psnr = np.array(psnr).mean()
+    # if local_rank == 0:
+    #     print(str(nr_eval), psnr)
+    #     writer_val.add_scalar('psnr', psnr, nr_eval)
         
 if __name__ == "__main__":    
     parser = argparse.ArgumentParser()
