@@ -45,6 +45,7 @@ def test(images, idx):
 
         out = out[0].cpu().clamp(0.0, 1.0).numpy().transpose(1, 2, 0) * 255
         out = torch.tensor(out)
+        print(out.size())
 
         imwrite(images[0], result_dir + '/{}csi.jpg'.format(idx))
         imwrite(images[1], result_dir + '/{}csi.jpg'.format(idx+2))
