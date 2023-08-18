@@ -44,7 +44,7 @@ def test(images, idx):
         #     Image.fromarray(np.uint8(pred)).save(os.path.join(args.output_dir,'interp.png'))
 
         out = out[0].cpu().clamp(0.0, 1.0).numpy().transpose(1, 2, 0) * 255
-        out = torch.tensor(out)
+        out = torch.tensor(out).unsqueeze(0)
         print(images[0].size())
 
         imwrite(images[0], result_dir + '/{}csi.jpg'.format(idx))
