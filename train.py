@@ -18,6 +18,7 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data.distributed import DistributedSampler
 import torch.optim as optim
+from test import evalvis
 
 # from config import *
 from models import make_model, model_profile
@@ -82,8 +83,9 @@ def train(model, local_rank, batch_size, data_path, cfg):
                 print('epoch:{} {}/{} time:{:.2f}+{:.2f} loss:{:.4e}'.format(epoch, i, args.step_per_epoch, data_time_interval, train_time_interval, loss))
             step += 1
         nr_eval += 1
-        if nr_eval % 2 == 0:
-            evaluate(model, val_data, nr_eval, local_rank)
+        if nr_eval % 4 == 0:
+            # evaluate(model, val_data, nr_eval, local_rank)
+            evalvis(model)
 
         torch.save(model.state_dict(), save_path)
         dist.barrier()
