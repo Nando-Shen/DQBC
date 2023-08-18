@@ -10,12 +10,10 @@ from torchvision.utils import save_image as imwrite
 import numpy as np
 import os
 
-
-
 def read(idx):
-    # transforms = transforms.Compose([
-    #     transforms.ToTensor()
-    # ])
+    transformers = transforms.Compose([
+        transforms.ToTensor()
+    ])
     input_dir = '/home/curry/jshe2377/sim_keras_init_1'
     # result_dir = '/home/curry/jshe2377/csi_vis_result'
     data_list = []
@@ -26,7 +24,7 @@ def read(idx):
     data_list.extend([img0, img1, gt])
     images = [Image.open(pth) for pth in data_list]
     size = (384, 192)
-    images = [torch.tensor(img_.resize(size)).unsqueeze(0) for img_ in images]
+    images = [transformers(img_.resize(size)).unsqueeze(0) for img_ in images]
 
     return images
 
