@@ -76,7 +76,7 @@ def evalvis(model):
     model.eval()
     device = torch.device('cuda')
     for i in range(1, 199, 2):
-        images = read(i,model)
+        images = read(i)
         test(images,i,model,device)
 
     # with torch.no_grad():
