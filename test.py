@@ -11,7 +11,7 @@ import numpy as np
 import os
 
 input_dir = '/home/curry/jshe2377/sim_keras_init_1'
-result_dir = '/home/kuhu6123/jshe2377/csi_vis_result'
+result_dir = '/home/curry/jshe2377/csi_vis_result'
 transforms = transforms.Compose([
                 transforms.ToTensor()
             ])
