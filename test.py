@@ -41,7 +41,7 @@ def test(images, idx, model,device):
         #     pred = pred[0].cpu().clamp(0.0, 1.0).numpy().transpose(1, 2, 0)*255
         #     Image.fromarray(np.uint8(pred)).save(os.path.join(args.output_dir,'interp.png'))
 
-        out = out[0].cpu().clamp(0.0, 1.0).numpy() * 255
+        out = out[0].cpu().clamp(0.0, 1.0).numpy()
         out = torch.tensor(out).unsqueeze(0)
         # print(images[0].size())
         # print(out.size())
