@@ -13,6 +13,9 @@ import os
 
 
 def read(idx):
+    transforms = transforms.Compose([
+        transforms.ToTensor()
+    ])
     input_dir = '/home/curry/jshe2377/sim_keras_init_1'
     # result_dir = '/home/curry/jshe2377/csi_vis_result'
     data_list = []
@@ -33,9 +36,6 @@ def test(images, idx, model,device):
     print('Evaluating for {}'.format(idx))
     model.eval()
     torch.cuda.empty_cache()
-    transforms = transforms.Compose([
-        transforms.ToTensor()
-    ])
     with torch.no_grad():
 
         images = [img_.to(device) for img_ in images]
