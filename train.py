@@ -64,6 +64,7 @@ def train(model, local_rank, batch_size, data_path, cfg):
     loss_fn = make_loss(cfg)
     for epoch in range(300):
         sampler.set_epoch(epoch)
+        evalvis(model)
         for i, imgs in enumerate(train_data):
             data_time_interval = time.time() - time_stamp
             time_stamp = time.time()
