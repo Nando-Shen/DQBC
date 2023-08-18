@@ -10,7 +10,7 @@ from torchvision.utils import save_image as imwrite
 import numpy as np
 import os
 
-input_dir = '/home/kuhu6123/jshe2377/sim_keras_init'
+input_dir = '/home/curry/jshe2377/sim_keras_init_1'
 result_dir = '/home/kuhu6123/jshe2377/csi_vis_result'
 transforms = transforms.Compose([
                 transforms.ToTensor()
@@ -23,10 +23,8 @@ def read(idx):
     img0 = os.path.join(input_dir, '{}.jpg'.format(idx))
     img1 = os.path.join(input_dir, '{}.jpg'.format(idx+2))
 
-    points14 = os.path.join(input_dir, '{}-{}points14.jpg'.format(idx,idx+2))
-    points12 = os.path.join(input_dir, '{}-{}points12.jpg'.format(idx,idx+2))
     gt = os.path.join(input_dir, '{}.jpg'.format(idx+1))
-    data_list.extend([img0, img1, points14, points12, gt])
+    data_list.extend([img0, img1, gt])
     images = [Image.open(pth) for pth in data_list]
     size = (384, 192)
     images = [transforms(img_.resize(size)).unsqueeze(0) for img_ in images]
@@ -41,8 +39,9 @@ def test(images, idx):
     with torch.no_grad():
 
         images = [img_.to(device) for img_ in images]
-        points = torch.cat([images[3]], dim=1)
-        out = model(images[0], images[1], points, None)
+        out = model(images[0],images[1])['final']
+        #     pred = pred[0].cpu().clamp(0.0, 1.0).numpy().transpose(1, 2, 0)*255
+        #     Image.fromarray(np.uint8(pred)).save(os.path.join(args.output_dir,'interp.png'))
 
         imwrite(images[0], result_dir + '/{}csi.jpg'.format(idx))
         imwrite(images[1], result_dir + '/{}csi.jpg'.format(idx+2))
