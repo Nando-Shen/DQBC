@@ -93,7 +93,7 @@ def train(model, local_rank, batch_size, data_path, cfg):
 def evaluate(model, val_data, nr_eval, local_rank):
     if local_rank == 0:
         writer_val = SummaryWriter('log/validate_EMAVFI')
-    path = '/home/curry/jshe2377/atd12k_points'
+    path = '/share/hhd3/kuhu6123/atd12k_points/atd12k_points'
     f = os.listdir(os.path.join(path, 'test_2k_540p'))
     psnr_list, ssim_list = [], []
 
@@ -119,7 +119,7 @@ def evaluate(model, val_data, nr_eval, local_rank):
         psnr = -10 * math.log10(((I1 - mid) * (I1 - mid)).mean())
         # os.makedirs('/home/curry/jshe2377/dqtest/' + name)
         mid = mid * 255.
-        cv2.imwrite(r"/home/curry/jshe2377/dqtest/" + name + "/emavfi.jpg", mid)
+        cv2.imwrite(r"/home/kuhu6123/jshe2377/DQBC/dqtest/" + name + "/dqbc.jpg", mid)
         psnr_list.append(psnr)
         ssim_list.append(ssim)
 
