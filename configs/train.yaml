@@ -1,7 +1,7 @@
 model:
   name: DQBC
   size_mod: 64
-  pretrained: experiments/dqbc-animerun/checkpoints/dqbc-animerun.pth
+  pretrained: experiments/dqbc/checkpoints/dqbc.pth
   corr:
     arch: x
     radius: [6,4,3]

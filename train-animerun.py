@@ -137,9 +137,9 @@ def evaluate(model, local_rank):
         # mid = mid.detach().cpu().numpy().transpose(1, 2, 0)
         # I1 = I1 / 255.
         # psnr = -10 * math.log10(((I1 - mid) * (I1 - mid)).mean())
-        os.makedirs('/home/kuhu6123/jshe2377/DQBC/dqbc-animerun-finetune-v/' + name)
+        os.makedirs('/home/kuhu6123/jshe2377/DQBC/dqbc-animerun/' + name)
         # mid = mid * 255.
-        imwrite(out, r"/home/kuhu6123/jshe2377/DQBC/dqbc-animerun-finetune-v/" + name + "/dqbc.jpg")
+        imwrite(out, r"/home/kuhu6123/jshe2377/DQBC/dqbc-animerun/" + name + "/dqbc.jpg")
 
         # imwrite(r"/home/kuhu6123/jshe2377/DQBC/dqbc-animerun-finetune-v/" + name + "/dqbc.jpg")
         # psnr_list.append(psnr)
