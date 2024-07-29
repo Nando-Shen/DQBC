@@ -91,11 +91,11 @@ def train(model, local_rank, batch_size, data_path, cfg):
         torch.save(model.state_dict(), save_path)
         dist.barrier()
 
-def evaluate(model, val_data, nr_eval, local_rank):
+def evaluate(model, local_rank):
     if local_rank == 0:
         writer_val = SummaryWriter('log/validate_EMAVFI')
     path = '/home/kuhu6123/jshe2377/AnimeRun/AnimeRun'
-    f = os.listdir(os.path.join(path, '/test/contourcopy'))
+    f = os.listdir('/home/kuhu6123/jshe2377/AnimeRun/AnimeRun/test/contourcopy')
     psnr_list, ssim_list = [], []
 
     for i in f:
@@ -165,4 +165,6 @@ if __name__ == "__main__":
     torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.benchmark = True
     # model = Model(args.local_rank)
+    evaluate(model, args.local_rank)
+    exit()
     train(model, args.local_rank, args.batch_size, args.data_path, cfg)
