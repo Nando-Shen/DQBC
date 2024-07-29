@@ -107,6 +107,8 @@ def evaluate(model, local_rank):
     ])
 
     for i in f:
+        if i == '.DS_Store':
+            continue
         name = str(i).strip()
         size = (384, 192)
         if (len(name) <= 1):
