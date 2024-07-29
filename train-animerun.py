@@ -17,6 +17,10 @@ from dataset import VimeoDataset
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data.distributed import DistributedSampler
+from PIL import Image
+from torchvision import transforms
+from torchvision.utils import save_image as imwrite
+
 import torch.optim as optim
 from test import evalvis
 
@@ -97,34 +101,49 @@ def evaluate(model, local_rank):
     path = '/home/kuhu6123/jshe2377/AnimeRun/AnimeRun'
     f = os.listdir('/home/kuhu6123/jshe2377/AnimeRun/AnimeRun/test/contourcopy')
     psnr_list, ssim_list = [], []
+    model.eval()
+    transformers = transforms.Compose([
+        transforms.ToTensor()
+    ])
 
     for i in f:
         name = str(i).strip()
         size = (384, 192)
         if (len(name) <= 1):
             continue
-        I0 = cv2.imread(path + '/test/contourcopy/' + name + '/frame1.jpg')
-        I1 = cv2.imread(path + '/test/contourcopy/' + name + '/frame2.jpg')
-        I2 = cv2.imread(path + '/test/contourcopy/' + name + '/frame3.jpg')  # BGR -> RBG
-        I0 = cv2.resize(I0, size)
-        I1 = cv2.resize(I1, size)
-        I2 = cv2.resize(I2, size)
-        I0 = (torch.tensor(I0.transpose(2, 0, 1)).cuda() / 255.).unsqueeze(0)
-        I2 = (torch.tensor(I2.transpose(2, 0, 1)).cuda() / 255.).unsqueeze(0)
-        with torch.no_grad():
-            mid = model(I0, I2)['final'][0]
-        ssim = ssim_matlab(torch.tensor(I1.transpose(2, 0, 1)).cuda().unsqueeze(0) / 255.,
-                           mid.unsqueeze(0)).detach().cpu().numpy()
-        mid = mid.detach().cpu().numpy().transpose(1, 2, 0)
-        I1 = I1 / 255.
-        psnr = -10 * math.log10(((I1 - mid) * (I1 - mid)).mean())
-        os.makedirs('/home/kuhu6123/jshe2377/DQBC/dqbc-animerun-finetune-v/' + name)
-        mid = mid * 255.
-        cv2.imwrite(r"/home/kuhu6123/jshe2377/DQBC/dqbc-animerun-finetune-v/" + name + "/dqbc.jpg", mid)
-        psnr_list.append(psnr)
-        ssim_list.append(ssim)
+        I0 = Image.open(path + '/test/contourcopy/' + name + '/frame1.jpg')
+        I1 = Image.open(path + '/test/contourcopy/' + name + '/frame2.jpg')
+        I2 = Image.open(path + '/test/contourcopy/' + name + '/frame3.jpg')  # BGR -> RBG
+        images = [I0, I1, I2]
+        images = [transformers(img_.resize(size)).unsqueeze(0) for img_ in images]
+        images = [img_.to(device) for img_ in images]
 
-        print("Avg PSNR: {} SSIM: {}".format(np.mean(psnr_list), np.mean(ssim_list)))
+
+        # I0 = cv2.resize(I0, size)
+        # I1 = cv2.resize(I1, size)
+        # I2 = cv2.resize(I2, size)
+        # I0 = (torch.tensor(I0.transpose(2, 0, 1)).cuda() / 255.).unsqueeze(0)
+        # I2 = (torch.tensor(I2.transpose(2, 0, 1)).cuda() / 255.).unsqueeze(0)
+        with torch.no_grad():
+            # mid = model(I0, I2)['final'][0]
+            out = model(I0, I2)['final']
+        # ssim = ssim_matlab(torch.tensor(I1.transpose(2, 0, 1)).cuda().unsqueeze(0) / 255.,
+        #                    mid.unsqueeze(0)).detach().cpu().numpy()
+        out = out[0].cpu().clamp(0.0, 1.0).numpy()
+        out = torch.tensor(out).unsqueeze(0)
+
+        # mid = mid.detach().cpu().numpy().transpose(1, 2, 0)
+        # I1 = I1 / 255.
+        # psnr = -10 * math.log10(((I1 - mid) * (I1 - mid)).mean())
+        os.makedirs('/home/kuhu6123/jshe2377/DQBC/dqbc-animerun-finetune-v/' + name)
+        # mid = mid * 255.
+        imwrite(out, r"/home/kuhu6123/jshe2377/DQBC/dqbc-animerun-finetune-v/" + name + "/dqbc.jpg")
+
+        # imwrite(r"/home/kuhu6123/jshe2377/DQBC/dqbc-animerun-finetune-v/" + name + "/dqbc.jpg")
+        # psnr_list.append(psnr)
+        # ssim_list.append(ssim)
+
+    print("Avg PSNR: {} SSIM: {}".format(np.mean(psnr_list), np.mean(ssim_list)))
 
     #
     # psnr = []
