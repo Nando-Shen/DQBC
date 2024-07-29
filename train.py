@@ -84,8 +84,8 @@ def train(model, local_rank, batch_size, data_path, cfg):
             step += 1
         nr_eval += 1
         if nr_eval % 8 == 0:
-            # evaluate(model, val_data, nr_eval, local_rank)
-            evalvis(model)
+            evaluate(model, val_data, nr_eval, local_rank)
+            # evalvis(model)
 
         torch.save(model.state_dict(), save_path)
         dist.barrier()
@@ -119,7 +119,7 @@ def evaluate(model, val_data, nr_eval, local_rank):
         psnr = -10 * math.log10(((I1 - mid) * (I1 - mid)).mean())
         # os.makedirs('/home/curry/jshe2377/dqtest/' + name)
         mid = mid * 255.
-        cv2.imwrite(r"/home/kuhu6123/jshe2377/DQBC/dqtest/" + name + "/dqbc.jpg", mid)
+        # cv2.imwrite(r"/home/kuhu6123/jshe2377/DQBC/dqtest/" + name + "/dqbc.jpg", mid)
         psnr_list.append(psnr)
         ssim_list.append(ssim)
 
