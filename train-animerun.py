@@ -126,7 +126,7 @@ def evaluate(model, local_rank):
         # I2 = (torch.tensor(I2.transpose(2, 0, 1)).cuda() / 255.).unsqueeze(0)
         with torch.no_grad():
             # mid = model(I0, I2)['final'][0]
-            out = model(I0, I2)['final']
+            out = model(images[0], images[2])['final']
         # ssim = ssim_matlab(torch.tensor(I1.transpose(2, 0, 1)).cuda().unsqueeze(0) / 255.,
         #                    mid.unsqueeze(0)).detach().cpu().numpy()
         out = out[0].cpu().clamp(0.0, 1.0).numpy()
