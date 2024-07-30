@@ -186,6 +186,6 @@ if __name__ == "__main__":
     torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.benchmark = True
     # model = Model(args.local_rank)
-    # evaluate(model, args.local_rank)
-    # exit()
-    train(model, args.local_rank, args.batch_size, args.data_path, cfg)
+    evaluate(model, args.local_rank)
+    exit()
+    # train(model, args.local_rank, args.batch_size, args.data_path, cfg)
