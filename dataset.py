@@ -149,7 +149,7 @@ class AnimeRunDataset(Dataset):
         img0, gt, img1 = self.getimg(index)
 
         if 'train' in self.dataset_name:
-            img0, gt, img1 = self.aug(img0, gt, img1, 256, 256)
+            img0, gt, img1 = self.aug(img0, gt, img1, 192, 192)
             if random.uniform(0, 1) < 0.5:
                 img0 = img0[:, :, ::-1]
                 img1 = img1[:, :, ::-1]
