@@ -88,7 +88,8 @@ def train(model, local_rank, batch_size, data_path, cfg):
             step += 1
         nr_eval += 1
         if nr_eval % 1 == 0:
-            # evaluate(model, val_data, nr_eval, local_rank)
+            evaluate(model, local_rank)
+
             exit()
             # evalvis(model)
 
@@ -146,7 +147,7 @@ def evaluate(model, local_rank):
         # ssim_list.append(ssim)
 
     print("Avg PSNR: {} SSIM: {}".format(np.mean(psnr_list), np.mean(ssim_list)))
-
+    exit()
     #
     # psnr = []
     # for _, imgs in enumerate(val_data):
@@ -186,6 +187,6 @@ if __name__ == "__main__":
     torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.benchmark = True
     # model = Model(args.local_rank)
-    evaluate(model, args.local_rank)
-    exit()
-    # train(model, args.local_rank, args.batch_size, args.data_path, cfg)
+    # evaluate(model, args.local_rank)
+    # exit()
+    train(model, args.local_rank, args.batch_size, args.data_path, cfg)
