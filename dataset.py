@@ -101,8 +101,8 @@ class AnimeRunDataset(Dataset):
         self.batch_size = batch_size
         self.dataset_name = dataset_name
         self.model = model
-        self.h = 256
-        self.w = 448
+        self.h = 192
+        self.w = 384
         self.data_root = path
         self.image_root = self.data_root
         # train_fn = os.path.join(self.data_root, 'tri_trainlist.txt')
