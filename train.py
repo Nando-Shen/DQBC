@@ -31,7 +31,7 @@ exp = os.path.abspath('.').split('/')[-1]
 def make_optimizer(cfg, model):
     """ Create the optimizer and learning rate scheduler """
 
-    optimizer = optim.AdamW(model.parameters(), lr=2e-5, weight_decay=cfg.wdecay)
+    optimizer = optim.AdamW(model.parameters(), lr=1e-6, weight_decay=cfg.wdecay)
 
     return optimizer
 
@@ -83,7 +83,7 @@ def train(model, local_rank, batch_size, data_path, cfg):
                 print('epoch:{} {}/{} time:{:.2f}+{:.2f} loss:{:.4e}'.format(epoch, i, args.step_per_epoch, data_time_interval, train_time_interval, loss))
             step += 1
         nr_eval += 1
-        if nr_eval % 10 == 0:
+        if nr_eval % 2 == 0:
             # evaluate(model, val_data, nr_eval, local_rank)
             exit()
             # evalvis(model)
