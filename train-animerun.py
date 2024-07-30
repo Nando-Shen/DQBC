@@ -13,7 +13,7 @@ import os.path as osp
 from utils.config import make_config
 from benchmark.utils.pytorch_msssim import ssim_matlab
 
-from dataset import VimeoDataset
+from dataset import AnimeRunDataset
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data.distributed import DistributedSampler
@@ -57,11 +57,11 @@ def train(model, local_rank, batch_size, data_path, cfg):
     step = 0
     nr_eval = 0
     best = 0
-    dataset = VimeoDataset('train', data_path)
+    dataset = AnimeRunDataset('train', data_path)
     sampler = DistributedSampler(dataset)
     train_data = DataLoader(dataset, batch_size=batch_size, num_workers=8, pin_memory=True, drop_last=True, sampler=sampler)
     args.step_per_epoch = train_data.__len__()
-    dataset_val = VimeoDataset('test', data_path)
+    dataset_val = AnimeRunDataset('test', data_path)
     val_data = DataLoader(dataset_val, batch_size=batch_size, pin_memory=True, num_workers=8)
     print('training...')
     time_stamp = time.time()
@@ -87,8 +87,8 @@ def train(model, local_rank, batch_size, data_path, cfg):
                 print('epoch:{} {}/{} time:{:.2f}+{:.2f} loss:{:.4e}'.format(epoch, i, args.step_per_epoch, data_time_interval, train_time_interval, loss))
             step += 1
         nr_eval += 1
-        if nr_eval % 8 == 0:
-            evaluate(model, val_data, nr_eval, local_rank)
+        if nr_eval % 1 == 0:
+            # evaluate(model, val_data, nr_eval, local_rank)
             exit()
             # evalvis(model)
 
@@ -186,6 +186,6 @@ if __name__ == "__main__":
     torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.benchmark = True
     # model = Model(args.local_rank)
-    evaluate(model, args.local_rank)
-    exit()
+    # evaluate(model, args.local_rank)
+    # exit()
     train(model, args.local_rank, args.batch_size, args.data_path, cfg)
