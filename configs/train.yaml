@@ -92,7 +92,7 @@ log:
   sum_freq: 500
 
 
-exp_name: dqbc
+exp_name: dqbc-animerun
 reset: true
 
 # CUDA_VISIBLE_DEVICES=0,1,2,3 torchrun --nproc_per_node=4 --master_port 8368 train.py --config configs/train.yaml
