@@ -17,6 +17,8 @@ from dataset import VimeoDataset
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data.distributed import DistributedSampler
+from functools import partial
+
 import torch.optim as optim
 from test import evalvis
 
@@ -27,13 +29,41 @@ from models import make_model, model_profile
 device = torch.device("cuda")
 exp = os.path.abspath('.').split('/')[-1]
 
+def warm_cosine_scheduler(step,total_steps,peak=3e-4,bottom=3e-5,peak_step=2000):
+    # step ~ [0,total_steps)
+    step = step + 1
+    if step < peak_step:
+        mul = step / peak_step
+        return peak * mul
+    elif step >= total_steps:
+        return bottom
+    else:
+        mul = np.cos((step - peak_step) / (total_steps - peak_step) * math.pi) * 0.5 + 0.5
+        return (peak - bottom) * mul + bottom
+
+def multi_step_scheduler(step,initial,steps,decay):
+    lr = initial
+    for s in steps:
+        if step >= s:
+            lr *= decay
+        else:
+            break
+    return lr
 
 def make_optimizer(cfg, model):
     """ Create the optimizer and learning rate scheduler """
 
-    optimizer = optim.AdamW(model.parameters(), lr=1e-6, weight_decay=cfg.wdecay)
+    if cfg.lr.type == 'multi_step':
+        lr = cfg.lr.initial
+        scheduler = partial(multi_step_scheduler, initial=cfg.lr.initial, steps=cfg.lr.steps, decay=cfg.lr.decay)
+    elif cfg.lr.type == 'warm_cosine':
+        lr = 1e-6
+        scheduler = partial(warm_cosine_scheduler, total_steps=cfg.lr.total_steps, peak=cfg.lr.peak,
+                            bottom=cfg.lr.bottom, peak_step=cfg.lr.peak_step)
 
-    return optimizer
+    optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=cfg.wdecay)
+
+    return optimizer, scheduler
 
 
 def get_learning_rate(step):
@@ -83,8 +113,9 @@ def train(model, local_rank, batch_size, data_path, cfg):
                 print('epoch:{} {}/{} time:{:.2f}+{:.2f} loss:{:.4e}'.format(epoch, i, args.step_per_epoch, data_time_interval, train_time_interval, loss))
             step += 1
         nr_eval += 1
-        # if nr_eval % 8 == 0:
+        if nr_eval % 10 == 0:
             # evaluate(model, val_data, nr_eval, local_rank)
+            exit()
             # evalvis(model)
 
         torch.save(model.state_dict(), save_path)
