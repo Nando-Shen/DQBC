@@ -1,7 +1,7 @@
 model:
   name: DQBC
   size_mod: 64
-#  pretrained: experiments/dqbc/checkpoints/dqbc.pth
+  pretrained: 510000.pth
   corr:
     arch: x
     radius: [6,4,3]
